@@ -8,6 +8,11 @@ from rest_framework import viewsets
 from .models import *
 from .serializers import *
 
+# ‘Get’ = the read
+# ‘Post’ = is create
+# ‘Put’ = is update
+# ‘Delete’ = is delete
+
 #########################################################################################################
 # User Views
 
@@ -60,7 +65,7 @@ def create_user(request):
 
 # @api_view(['GET'])
 # @permission_classes([IsAuthenticated])
-# # isAuthenticated is something we imported, we could also do IsAdmin or allowAny, it's gonna looks for the JWT for the user
+# @parser_classes([MultiPartParser, FormParser])
 # def get_images(request):
 #   images = Image.objects.all()
 #   # default is many=False, which would just serialize one object, this will return a whole list
