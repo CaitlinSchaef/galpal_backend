@@ -1,5 +1,5 @@
 from django.contrib import admin
-from app_image_upload.models import *
+from app_galpal.models import *
 
 
 class ProfileAdmin(admin.ModelAdmin):
