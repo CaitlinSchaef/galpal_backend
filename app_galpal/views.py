@@ -50,7 +50,8 @@ def create_user(request):
        bio = request.data['bio'],
        email = request.data['email'],
        phone = request.data['phone'],
-       location = request.data['location'],
+       city = request.data['city'],
+       state = request.data['state'],
        profile_photo = profile_photo
    )
    profile_serialized = ProfileSerializer(profile)
