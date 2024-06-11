@@ -73,3 +73,7 @@ def create_user(request):
 class InterestsViewSet(viewsets.ModelViewSet):
   queryset = Interests.objects.all()
   serializer_class = InterestsSerializer
+
+class MatchProfileQuestionsViewSet(viewsets.ModelViewSet):
+  queryset = MatchProfileQuestions.objects.all()
+  serializer_class = MatchProfileQuestionsSerializer
