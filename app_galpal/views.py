@@ -25,11 +25,12 @@ def get_profile(request):
   serializer = ProfileSerializer(profile, many=False)
   return Response(serializer.data)
 
-# Create New User
+
 #Create New User/User Profile
+# This works and saves images, as well as making sure the username, phone number, and email are unique.
 @api_view(['POST'])
 @permission_classes([])
-# the parser helps it read data
+# the parser helps it read data for images
 @parser_classes([MultiPartParser, FormParser])
 def create_user(request):
    user = User.objects.create(
@@ -60,16 +61,59 @@ def create_user(request):
 
 
 #########################################################################################################
+# Match Profile Questions
+
+# This gets all of the questions
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_profile_questions(request):
+  questions = MatchProfileQuestions.objects.all()
+  questions_serialized = MatchProfileQuestionsSerializer(questions, many=True)
+  return Response(questions_serialized.data)
+
+#########################################################################################################
 # Match Profile Answers
 
-# @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-# @parser_classes([MultiPartParser, FormParser])
-# def get_images(request):
-#   images = Image.objects.all()
-#   # default is many=False, which would just serialize one object, this will return a whole list
-#   images_serialized = ImageSerializer(images, many=True)
-#   return Response(images_serialized.data)
+# This gets all of the answers for a specific user
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_profile_answers(request):
+  answers = MatchProfileAnswers.objects.filter(user=request.data['user'])
+  answers_serialized = MatchProfileAnswersSerializer(answers, many=True)
+  return Response(answers_serialized.data)
+
+# This creates new answers
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+# the parser helps it read data for images
+@parser_classes([MultiPartParser, FormParser])
+def create_answer(request):
+   image_answer = None
+   if 'image_answer' in request.data:
+     image_answer = request.data['image_answer']
+
+   user = request.user
+  #  I might need to use this, but also since it's serialized I feel like I could just use it?
+  #  question_pk = MatchProfileQuestions.objects.filter(question=request.data['question']).first().pk
+   answer = MatchProfileAnswers.objects.create(
+       user = user,
+       question = request.data['question'],
+       answer = request.data['answer'],
+       image_answer = image_answer, 
+   )
+   answer.save()
+   answer_serialized = MatchProfileAnswersSerializer(answer)
+   return Response(answer_serialized.data)
+
+##########################################################################################################
+# message channels
+
+
+
+##########################################################################################################
+# messages
+
+
 
 ##########################################################################################################
 # class views for back end
