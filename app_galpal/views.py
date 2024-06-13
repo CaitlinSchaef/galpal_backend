@@ -54,11 +54,9 @@ def create_user(request):
        state = request.data['state'],
        profile_photo = profile_photo
    )
+   profile.save()
    profile_serialized = ProfileSerializer(profile)
-   if profile_serialized.is_valid():
-    profile.save()
-    return Response(profile_serialized.data, status=status.HTTP_201_CREATED)
-   return Response(profile_serialized.errors, status=status.HTTP_400_BAD_REQUEST)
+   return Response(profile_serialized.data)
 
 
 #########################################################################################################
