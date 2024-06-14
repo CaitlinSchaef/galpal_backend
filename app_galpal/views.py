@@ -124,12 +124,22 @@ def get_interests(request):
 @permission_classes([IsAuthenticated])
 def create_interest_inventory(request):
    user = request.user
-   interest = InterestInventory.objects.create(
-       user = user,
-       interest = request.data['interest'],
-   )
-   interest.save()
-   interest_serialized = InterestInventorySerializer(interest)
+   print('USER: ', user) 
+   profile = user.profile
+   print('PROFILE: ', profile)
+   
+  # Fetch or create Interests instance
+   interest_name = request.data['interest']
+   interest_instance = Interests.objects.get(interests=interest_name)
+
+    # Create InterestInventory object
+   interest_inventory = InterestInventory.objects.create(
+        user=profile,
+        interest=interest_instance,
+    )
+
+   interest_inventory.save()
+   interest_serialized = InterestInventorySerializer(interest_inventory)
    return Response(interest_serialized.data)
 
 # get interest inventory 

@@ -18,7 +18,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 class RequestedMatchSerializer(serializers.ModelSerializer):
   class Meta:
     model = RequestedMatch
-    fields = ['requester', 'requested', 'status', 'match', 'status_choices']
+    fields = ['requester', 'requested', 'status', 'matched', 'status_choices']
 
 #########################################################################################################
 class InterestsSerializer(serializers.ModelSerializer):
