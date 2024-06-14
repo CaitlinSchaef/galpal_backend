@@ -21,6 +21,8 @@ urlpatterns = [
     path('get-questions/', get_profile_questions),
     path('get-answers/', get_profile_answers),
     path('create-answer/', create_answer),
+    path('create-interest-inventory/', create_interest_inventory),
+    path('get-interests/', get_interests),
     path('refresh/', TokenRefreshView.as_view()),
     path('token/', TokenObtainPairView.as_view()),
 ]

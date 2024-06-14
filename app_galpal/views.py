@@ -105,6 +105,36 @@ def create_answer(request):
    answer_serialized = MatchProfileAnswersSerializer(answer)
    return Response(answer_serialized.data)
 
+#########################################################################################################
+#interests
+
+#get all interests
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_interests(request):
+  interests = Interests.objects.all()
+  interests_serialized = InterestsSerializer(interests, many=True)
+  return Response(interests_serialized.data)
+
+#########################################################################################################
+#interest inventory 
+
+# create new interest inventory 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_interest_inventory(request):
+   user = request.user
+   interest = InterestInventory.objects.create(
+       user = user,
+       interest = request.data['interest'],
+   )
+   interest.save()
+   interest_serialized = InterestInventorySerializer(interest)
+   return Response(interest_serialized.data)
+
+# get interest inventory 
+
+
 ##########################################################################################################
 # message channels
 
