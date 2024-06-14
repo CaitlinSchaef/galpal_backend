@@ -78,7 +78,9 @@ def get_profile_questions(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_profile_answers(request):
-  answers = MatchProfileAnswers.objects.filter(user=request.data['user'])
+  user = request.user
+  profile = user.profile
+  answers = MatchProfileAnswers.objects.filter(user=profile)
   answers_serialized = MatchProfileAnswersSerializer(answers, many=True)
   return Response(answers_serialized.data)
 
@@ -93,11 +95,13 @@ def create_answer(request):
      image_answer = request.data['image_answer']
 
    user = request.user
-  #  I might need to use this, but also since it's serialized I feel like I could just use it?
-  #  question_pk = MatchProfileQuestions.objects.filter(question=request.data['question']).first().pk
+   profile = profile.user
+   question_name = request.data['question']
+   question_data = MatchProfileQuestions.objects.get(question=question_name)
+  
    answer = MatchProfileAnswers.objects.create(
-       user = user,
-       question = request.data['question'],
+       user = profile,
+       question = question_data,
        answer = request.data['answer'],
        image_answer = image_answer, 
    )
@@ -128,14 +132,14 @@ def create_interest_inventory(request):
    profile = user.profile
    print('PROFILE: ', profile)
    
-  # Fetch or create Interests instance
+  # Fetch or create Interests instance, this is basically taking the response and translating it into acceptable data 
    interest_name = request.data['interest']
-   interest_instance = Interests.objects.get(interests=interest_name)
+   interest_data = Interests.objects.get(interests=interest_name)
 
     # Create InterestInventory object
    interest_inventory = InterestInventory.objects.create(
         user=profile,
-        interest=interest_instance,
+        interest=interest_data,
     )
 
    interest_inventory.save()
@@ -143,7 +147,12 @@ def create_interest_inventory(request):
    return Response(interest_serialized.data)
 
 # get interest inventory 
-
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_interest_inventory(request):
+  interest_inventory = InterestInventory.objects.all()
+  interest_inventory_serialized = InterestsSerializer(interest_inventory, many=True)
+  return Response(interest_inventory_serialized.data)
 
 ##########################################################################################################
 # message channels
