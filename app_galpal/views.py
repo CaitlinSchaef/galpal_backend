@@ -71,16 +71,21 @@ def get_profile_questions(request):
 def get_profile_answers(request):
   user = request.user
   profile = user.profile
+  # theres a chance i should just set this to user=user
   answers = MatchProfileAnswers.objects.filter(user=profile)
   answers_serialized = MatchProfileAnswersSerializer(answers, many=True)
   return Response(answers_serialized.data)
 
 # This creates new answers
+# this works
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 # the parser helps it read data for images
 @parser_classes([MultiPartParser, FormParser])
 def create_answer(request):
+  #  print the data to check 
+   print(request.data)
+  #  first set an image to be done
    image_answer = None
    if 'image_answer' in request.data:
      image_answer = request.data['image_answer']
@@ -88,6 +93,7 @@ def create_answer(request):
    user = request.user
    profile = user.profile
    question_name = request.data['question']
+   print("Question Name from Request Data:", question_name) 
    question_data = MatchProfileQuestions.objects.get(question=question_name)
   
    answer = MatchProfileAnswers.objects.create(
@@ -141,7 +147,10 @@ def create_interest_inventory(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_interest_inventory(request):
-  interest_inventory = InterestInventory.objects.all()
+  user = request.user
+  profile = user.profile
+  # may need to change this to user=user
+  interest_inventory = InterestInventory.objects.filter(user=profile)
   interest_inventory_serialized = InterestInventorySerializer(interest_inventory, many=True)
   return Response(interest_inventory_serialized.data)
 
@@ -164,16 +173,20 @@ def get_interest_inventory(request):
 # the parser helps it read data for images
 @parser_classes([MultiPartParser, FormParser])
 def create_match_profile(request):
+   print(request.data)
    profile_photo = None
    if 'profile_photo' in request.data:
      profile_photo = request.data['profile_photo']
 
    user = request.user
    profile = user.profile
-   answer = request.data['answers']
-   answer_data = MatchProfileAnswers.objects.all()
+   answer_data = MatchProfileAnswers.objects.filter(user=profile)
+  #  I think that i will change the above from a filter to a get maybe? or do a get on the answer_data, and then do a
+  #or
+  # answer_data = MatchProfileAnswers.objects.get(user=profile)
+  # answer_data.profile_answers.all()
   
-   match_display = MatchProfileAnswers.objects.create(
+   match_display = MatchProfileDisplay.objects.create(
        user = profile,
        display_name = request.data['display_name'],
        bio = request.data['bio'],
