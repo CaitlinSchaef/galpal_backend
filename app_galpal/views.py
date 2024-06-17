@@ -86,7 +86,7 @@ def create_answer(request):
      image_answer = request.data['image_answer']
 
    user = request.user
-   profile = profile.user
+   profile = user.profile
    question_name = request.data['question']
    question_data = MatchProfileQuestions.objects.get(question=question_name)
   
@@ -142,7 +142,7 @@ def create_interest_inventory(request):
 @permission_classes([IsAuthenticated])
 def get_interest_inventory(request):
   interest_inventory = InterestInventory.objects.all()
-  interest_inventory_serialized = InterestsSerializer(interest_inventory, many=True)
+  interest_inventory_serialized = InterestInventorySerializer(interest_inventory, many=True)
   return Response(interest_inventory_serialized.data)
 
 ##########################################################################################################
@@ -163,13 +163,13 @@ def get_interest_inventory(request):
 @permission_classes([IsAuthenticated])
 # the parser helps it read data for images
 @parser_classes([MultiPartParser, FormParser])
-def create_answer(request):
+def create_match_profile(request):
    profile_photo = None
    if 'profile_photo' in request.data:
      profile_photo = request.data['profile_photo']
 
    user = request.user
-   profile = profile.user
+   profile = user.profile
    answer = request.data['answers']
    answer_data = MatchProfileAnswers.objects.all()
   
@@ -185,6 +185,14 @@ def create_answer(request):
    match_display.save()
    match_display_serialized = MatchProfileDisplaySerializer(match_display)
    return Response(match_display_serialized.data)
+
+# get match profile
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_match_profile(request):
+  match_profile = MatchProfileDisplay.objects.all()
+  match_profile_serialized = MatchProfileDisplaySerializer(match_profile)
+  return Response(match_profile_serialized.data)
 
 ##########################################################################################################
 # class views for back end

@@ -65,7 +65,15 @@ class MatchProfileAnswersSerializer(serializers.ModelSerializer):
 #########################################################################################################
 class MatchProfileDisplaySerializer(serializers.ModelSerializer):
   answers = MatchProfileAnswersSerializer()
+  # answers = serializers.PrimaryKeyRelatedField(queryset=MatchProfileAnswers.objects.all())
 
   class Meta:
     model = MatchProfileDisplay
     fields = ['user', 'display_name', 'bio', 'city', 'state', 'profile_photo', 'answers']
+
+
+#########################################################################################################
+class FriendsListSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = FriendsList
+    fields = ['user', 'friend']
