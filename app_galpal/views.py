@@ -39,21 +39,12 @@ def create_user(request):
    user.set_password(request.data['password'])
    user.save()
   
-   profile_photo = None
-   if 'profile_photo' in request.data:
-     profile_photo = request.data['profile_photo']
 
    profile = Profile.objects.create(
        user = user,
        first_name = request.data['first_name'],
        last_name = request.data['last_name'],
-       display_name = request.data['display_name'],
-       bio = request.data['bio'],
        email = request.data['email'],
-       phone = request.data['phone'],
-       city = request.data['city'],
-       state = request.data['state'],
-       profile_photo = profile_photo
    )
    profile.save()
    profile_serialized = ProfileSerializer(profile)
@@ -163,6 +154,37 @@ def get_interest_inventory(request):
 # messages
 
 
+
+##########################################################################################################
+# Match Profile Display
+
+#create new Match Profile Display
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+# the parser helps it read data for images
+@parser_classes([MultiPartParser, FormParser])
+def create_answer(request):
+   profile_photo = None
+   if 'profile_photo' in request.data:
+     profile_photo = request.data['profile_photo']
+
+   user = request.user
+   profile = profile.user
+   answer = request.data['answers']
+   answer_data = MatchProfileAnswers.objects.all()
+  
+   match_display = MatchProfileAnswers.objects.create(
+       user = profile,
+       display_name = request.data['display_name'],
+       bio = request.data['bio'],
+       city = request.data['city'],
+       state = request.data['state'],
+       profile_photo = profile_photo,
+       answers = answer_data,
+   )
+   match_display.save()
+   match_display_serialized = MatchProfileDisplaySerializer(match_display)
+   return Response(match_display_serialized.data)
 
 ##########################################################################################################
 # class views for back end

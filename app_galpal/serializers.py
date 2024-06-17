@@ -12,7 +12,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
   class Meta:
     model = Profile
-    fields = ['id', 'first_name', 'last_name', 'user', 'email', 'phone', 'city', 'state', 'display_name', 'bio', 'profile_photo']
+    fields = ['id', 'first_name', 'last_name', 'user', 'email']
 
 #########################################################################################################
 class RequestedMatchSerializer(serializers.ModelSerializer):
@@ -63,3 +63,9 @@ class MatchProfileAnswersSerializer(serializers.ModelSerializer):
     fields = ['user', 'question', 'answer', 'image_answer']
 
 #########################################################################################################
+class MatchProfileDisplaySerializer(serializers.ModelSerializer):
+  answers = MatchProfileAnswersSerializer()
+
+  class Meta:
+    model = MatchProfileDisplay
+    fields = ['user', 'display_name', 'bio', 'city', 'state', 'profile_photo', 'answers']
