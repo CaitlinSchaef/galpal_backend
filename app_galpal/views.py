@@ -200,7 +200,11 @@ def create_match_profile(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_match_profile(request):
-  match_profile = MatchProfileDisplay.objects.all()
+  user = request.user
+  profile = user.profile
+  # theres only one match profile display per user, so we can do get 
+  
+  match_profile = MatchProfileDisplay.objects.get(user=profile)
   match_profile_serialized = MatchProfileDisplaySerializer(match_profile)
   return Response(match_profile_serialized.data)
 
