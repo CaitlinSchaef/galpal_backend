@@ -96,14 +96,14 @@ def create_answer(request):
    print("Question Name from Request Data:", question_name) 
    question_data = MatchProfileQuestions.objects.get(question=question_name)
   
-   profile_link = MatchProfileDisplay.objects.filter(user=profile)
+   profile_instance = MatchProfileDisplay.objects.get(user=profile)
   
    answer = MatchProfileAnswers.objects.create(
        user = profile,
        question = question_data,
        answer = request.data['answer'],
        image_answer = image_answer, 
-       profile_display = profile_link,
+       profile_display = profile_instance,
    )
    answer.save()
    answer_serialized = MatchProfileAnswersSerializer(answer)
