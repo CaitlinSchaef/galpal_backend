@@ -69,15 +69,6 @@ class MatchProfileQuestions(models.Model):
   def __str__(self):
     return f'Question: {self.question}'
 
-class MatchProfileAnswers(models.Model):
-  user = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, related_name='profile_answers')
-  question = models.ForeignKey(MatchProfileQuestions, on_delete=models.SET_NULL, null=True)
-  answer = models.TextField(max_length=300, null=True, blank=True)
-  image_answer = models.ImageField(upload_to='images/', null=True, blank=True)
-
-  def __str__(self):
-    return f'User: {self.user}, Question: {self.question}, Answer: {self.answer} {self.image_answer}'
-
 class MatchProfileDisplay(models.Model):
   user = models.OneToOneField(Profile, on_delete=models.CASCADE, related_name='match_profile')
   display_name = models.CharField(max_length=30, null=True)
@@ -85,10 +76,20 @@ class MatchProfileDisplay(models.Model):
   city = models.TextField(max_length=300, null=True, blank=True)
   state = models.TextField(max_length=300, null=True, blank=True)
   profile_photo = models.ImageField(upload_to='images/', null=True, blank=True) 
-  answers = models.ForeignKey(MatchProfileAnswers, on_delete=models.SET_NULL, null=True, related_name='profile_answers')
 
   def __str__(self):
     return f'User: {self.user}, Display Name: {self.display_name}, Bio: {self.bio}, Location: {self.city},{self.state}, Profile Photo: {self.profile_photo}  Answer: {self.answer} {self.image_answer}'
+
+class MatchProfileAnswers(models.Model):
+  user = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, related_name='profile_answers')
+  question = models.ForeignKey(MatchProfileQuestions, on_delete=models.SET_NULL, null=True)
+  answer = models.TextField(max_length=300, null=True, blank=True)
+  image_answer = models.ImageField(upload_to='images/', null=True, blank=True)
+  profile_display = models.ForeignKey(MatchProfileDisplay, on_delete=models.SET_NULL, null=True, related_name='answers')
+
+  def __str__(self):
+    return f'User: {self.user}, Question: {self.question}, Answer: {self.answer} {self.image_answer}'
+
 
 class FriendsList(models.Model):
   user = models.OneToOneField(Profile, on_delete=models.CASCADE, related_name='profile_user')

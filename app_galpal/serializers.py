@@ -54,23 +54,21 @@ class MatchProfileQuestionsSerializer(serializers.ModelSerializer):
     model = MatchProfileQuestions
     fields = ['id', 'question']
 
-#########################################################################################################
-class MatchProfileAnswersSerializer(serializers.ModelSerializer):
-  question = MatchProfileQuestionsSerializer()
-
-  class Meta:
-    model = MatchProfileAnswers
-    fields = ['user', 'question', 'answer', 'image_answer']
 
 #########################################################################################################
 class MatchProfileDisplaySerializer(serializers.ModelSerializer):
-  answers = MatchProfileAnswersSerializer()
-  # answers = serializers.PrimaryKeyRelatedField(queryset=MatchProfileAnswers.objects.all())
-
   class Meta:
     model = MatchProfileDisplay
-    fields = ['user', 'display_name', 'bio', 'city', 'state', 'profile_photo', 'answers']
+    fields = ['user', 'display_name', 'bio', 'city', 'state', 'profile_photo']
 
+#########################################################################################################
+class MatchProfileAnswersSerializer(serializers.ModelSerializer):
+  question = MatchProfileQuestionsSerializer()
+  profile_display = MatchProfileDisplaySerializer()
+
+  class Meta:
+    model = MatchProfileAnswers
+    fields = ['user', 'question', 'answer', 'image_answer', 'profile_display']
 
 #########################################################################################################
 class FriendsListSerializer(serializers.ModelSerializer):

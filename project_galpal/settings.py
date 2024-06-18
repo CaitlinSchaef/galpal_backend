@@ -79,7 +79,8 @@ STORAGES = {
 },
 }
 
-CORS_ALLOWED_ORIGINS = ['http://localhost:8080']
+# if you get a cors issue in deployment try adding a / at the end of the vercel url
+CORS_ALLOWED_ORIGINS = ['http://localhost:8080', 'https://galpal-frontend.vercel.app']
 
 CORS_ALLOW_METHODS = [
     'GET',

@@ -96,11 +96,14 @@ def create_answer(request):
    print("Question Name from Request Data:", question_name) 
    question_data = MatchProfileQuestions.objects.get(question=question_name)
   
+   profile_link = MatchProfileDisplay.objects.filter(user=profile)
+  
    answer = MatchProfileAnswers.objects.create(
        user = profile,
        question = question_data,
        answer = request.data['answer'],
        image_answer = image_answer, 
+       profile_display = profile_link,
    )
    answer.save()
    answer_serialized = MatchProfileAnswersSerializer(answer)
@@ -180,11 +183,6 @@ def create_match_profile(request):
 
    user = request.user
    profile = user.profile
-   answer_data = MatchProfileAnswers.objects.filter(user=profile)
-  #  I think that i will change the above from a filter to a get maybe? or do a get on the answer_data, and then do a
-  #or
-  # answer_data = MatchProfileAnswers.objects.get(user=profile)
-  # answer_data.profile_answers.all()
   
    match_display = MatchProfileDisplay.objects.create(
        user = profile,
@@ -193,7 +191,6 @@ def create_match_profile(request):
        city = request.data['city'],
        state = request.data['state'],
        profile_photo = profile_photo,
-       answers = answer_data,
    )
    match_display.save()
    match_display_serialized = MatchProfileDisplaySerializer(match_display)
