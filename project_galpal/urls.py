@@ -25,7 +25,7 @@ urlpatterns = [
     path('get-interest-inventory/', get_interest_inventory),
     path('get-interests/', get_interests),
     path('create-match-profile/', create_match_profile),
-    path('get-match-profile', get_match_profile), 
+    path('get-match-profile/', get_match_profile), 
     path('refresh/', TokenRefreshView.as_view()),
     path('token/', TokenObtainPairView.as_view()),
 ]
