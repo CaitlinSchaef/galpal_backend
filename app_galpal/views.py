@@ -16,6 +16,16 @@ from .serializers import *
 #########################################################################################################
 # User Views
 
+#delete user
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_user(request):
+   user = request.user
+   user_to_delete = User.objects.get(user=user)
+   user_to_delete.delete()
+   return Response(status=status.HTTP_202_ACCEPTED)
+
+
 # Get Profile
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -24,6 +34,7 @@ def get_profile(request):
   profile = user.profile
   serializer = ProfileSerializer(profile, many=False)
   return Response(serializer.data)
+
 
 
 #Create New User/User Profile
@@ -236,7 +247,7 @@ def get_match_requests(request):
 @permission_classes([IsAuthenticated])
 def update_match_request(request, id):
     try:
-        match_request = get_object_or_404(MatchRequest, id=id)
+        match_request = get_object_or_404(RequestedMatch, id=id)
 
         if match_request.requester != request.user.profile and match_request.requested != request.user.profile:
             return Response({'error': 'Not authorized to update this match request.'}, status=status.HTTP_403_FORBIDDEN)
@@ -269,8 +280,8 @@ def update_match_request(request, id):
                 'user': match_request.requested.id,
                 'friend': match_request.requester.id
             }
-            friend_serializer_1 = FriendSerializer(data=friend_data_1)
-            friend_serializer_2 = FriendSerializer(data=friend_data_2)
+            friend_serializer_1 = FriendsListSerializer(data=friend_data_1)
+            friend_serializer_2 = FriendsListSerializer(data=friend_data_2)
             if friend_serializer_1.is_valid() and friend_serializer_2.is_valid():
                 friend_serializer_1.save()
                 friend_serializer_2.save()
@@ -278,26 +289,33 @@ def update_match_request(request, id):
                 return Response(friend_serializer_1.errors or friend_serializer_2.errors, status=status.HTTP_400_BAD_REQUEST)
 
         match_request.save()
-        return Response(MatchRequestSerializer(match_request).data, status=status.HTTP_200_OK)
+        return Response(RequestedMatchSerializer(match_request).data, status=status.HTTP_200_OK)
 
-    except MatchRequest.DoesNotExist:
+    except RequestedMatch.DoesNotExist:
         return Response({'error': 'Match request not found.'}, status=status.HTTP_404_NOT_FOUND)
 
 ##########################################################################################################
 # message channels
 
+#get message channel
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_message_channel(request):
+  message_channel = MessageChannel.objects.all()
+  message_channel_serialized = RequestedMatchSerializer(message_channel, many=True)
+  return Response(message_channel_serialized.data)
+
 #create a message channel
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-# the parser helps it read data for images
-@parser_classes([MultiPartParser, FormParser])
-def create_match_request(request):
+def create_message_channel(request):
    user = request.user
    profile = user.profile
   
-   message_channel = RequestedMatch.objects.create(
+   message_channel = MessageChannel.objects.create(
        name = request.data['name'],
-       user = profile
+       user1 = profile,
+       user2 = request.data['user2']
    )
    message_channel.save()
    message_channel_serialized = MessageChannelSerializer(message_channel)
@@ -307,6 +325,21 @@ def create_match_request(request):
 ##########################################################################################################
 # messages
 
+#create a new message
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_message(request):
+   user = request.user
+   profile = user.profile
+  
+   message_channel = MessageChannel.objects.create(
+       name = request.data['name'],
+       user1 = profile,
+       user2 = request.data['user2']
+   )
+   message_channel.save()
+   message_channel_serialized = MessageChannelSerializer(message_channel)
+   return Response(message_channel_serialized.data)
 
 
 ##########################################################################################################

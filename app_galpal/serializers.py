@@ -38,7 +38,7 @@ class InterestInventorySerializer(serializers.ModelSerializer):
 class MessageChannelSerializer(serializers.ModelSerializer):
   class Meta:
     model = MessageChannel
-    fields = ['user', 'name']
+    fields = ['user1', 'user2', 'name']
 
 #########################################################################################################
 class MessageSerializer(serializers.ModelSerializer):
