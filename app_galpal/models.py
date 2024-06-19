@@ -49,10 +49,11 @@ class InterestInventory(models.Model):
 
 class MessageChannel(models.Model):
   name = models.CharField(max_length=200)
-  user = models.ManyToManyField(Profile)
+  user1 = models.ManyToManyField(Profile, related_name="user1")
+  user2 = models.ManyToManyField(Profile, related_name="user2")
 
   def __str__(self):
-    return f'Message Name: {self.name}, Users in Channel: {self.user} and {self.user}'
+    return f'Message Name: {self.name}, Users in Channel: {self.user1} and {self.user2}'
 
 class Message(models.Model):
   message_channel = models.ForeignKey(MessageChannel, on_delete=models.CASCADE, related_name='channel')
@@ -93,7 +94,7 @@ class MatchProfileAnswers(models.Model):
 
 class FriendsList(models.Model):
   user = models.OneToOneField(Profile, on_delete=models.CASCADE, related_name='profile_user')
-  friend = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, related_name='user_friends')
+  friend = models.ManyToManyField(Profile, related_name='user_friends')
 
   def __str__(self):
     return f'User: {self.user}, Friend: {self.friend}'

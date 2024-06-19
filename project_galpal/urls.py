@@ -26,6 +26,8 @@ urlpatterns = [
     path('get-interests/', get_interests),
     path('create-match-profile/', create_match_profile),
     path('get-match-profile/', get_match_profile), 
+    path('create-match-request/', create_match_request),
+    path('get-match-requests/', get_match_requests),
     path('refresh/', TokenRefreshView.as_view()),
     path('token/', TokenObtainPairView.as_view()),
 ]

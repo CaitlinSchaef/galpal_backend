@@ -158,16 +158,6 @@ def get_interest_inventory(request):
   return Response(interest_inventory_serialized.data)
 
 ##########################################################################################################
-# message channels
-
-
-
-##########################################################################################################
-# messages
-
-
-
-##########################################################################################################
 # Match Profile Display
 
 #create new Match Profile Display
@@ -207,6 +197,117 @@ def get_match_profile(request):
   match_profile = MatchProfileDisplay.objects.get(user=profile)
   match_profile_serialized = MatchProfileDisplaySerializer(match_profile)
   return Response(match_profile_serialized.data)
+
+# update match profile
+
+#########################################################################################################
+#requested match stuff
+
+#create a requested match
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+# the parser helps it read data for images
+@parser_classes([MultiPartParser, FormParser])
+def create_match_request(request):
+   user = request.user
+   profile = user.profile
+  
+   match_request = RequestedMatch.objects.create(
+       requester = profile,
+       requested = request.data['requester'],
+       status = request.data['status'],
+       matched = request.data['matched']
+   )
+   match_request.save()
+   match_request_serialized = RequestedMatchSerializer(match_request)
+   return Response(match_request_serialized.data)
+
+#get requested matches
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_match_requests(request):
+  match_request = RequestedMatch.objects.all()
+  match_request_serialized = RequestedMatchSerializer(match_request, many=True)
+  return Response(match_request_serialized.data)
+
+#update match request
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def update_match_request(request, id):
+    try:
+        match_request = get_object_or_404(MatchRequest, id=id)
+
+        if match_request.requester != request.user.profile and match_request.requested != request.user.profile:
+            return Response({'error': 'Not authorized to update this match request.'}, status=status.HTTP_403_FORBIDDEN)
+
+        data = request.data
+
+        status_updated = data.get('status', match_request.status)
+        match_request.status = status_updated
+
+        if status_updated == 'Approved':
+            match_request.matched = True
+
+            # Create message channel
+            channel_data = {
+                'name': f"{match_request.requester.display_name} and {match_request.requested.display_name}",
+                'users': [match_request.requester.id, match_request.requested.id]
+            }
+            channel_serializer = MessageChannelSerializer(data=channel_data)
+            if channel_serializer.is_valid():
+                channel_serializer.save()
+            else:
+                return Response(channel_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            # Add to friends list
+            friend_data_1 = {
+                'user': match_request.requester.id,
+                'friend': match_request.requested.id
+            }
+            friend_data_2 = {
+                'user': match_request.requested.id,
+                'friend': match_request.requester.id
+            }
+            friend_serializer_1 = FriendSerializer(data=friend_data_1)
+            friend_serializer_2 = FriendSerializer(data=friend_data_2)
+            if friend_serializer_1.is_valid() and friend_serializer_2.is_valid():
+                friend_serializer_1.save()
+                friend_serializer_2.save()
+            else:
+                return Response(friend_serializer_1.errors or friend_serializer_2.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        match_request.save()
+        return Response(MatchRequestSerializer(match_request).data, status=status.HTTP_200_OK)
+
+    except MatchRequest.DoesNotExist:
+        return Response({'error': 'Match request not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+##########################################################################################################
+# message channels
+
+#create a message channel
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+# the parser helps it read data for images
+@parser_classes([MultiPartParser, FormParser])
+def create_match_request(request):
+   user = request.user
+   profile = user.profile
+  
+   message_channel = RequestedMatch.objects.create(
+       name = request.data['name'],
+       user = profile
+   )
+   message_channel.save()
+   message_channel_serialized = MessageChannelSerializer(message_channel)
+   return Response(message_channel_serialized.data)
+
+
+##########################################################################################################
+# messages
+
+
 
 ##########################################################################################################
 # class views for back end

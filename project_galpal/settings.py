@@ -27,6 +27,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 #added paths for images
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+if APP_NAME:
+    MEDIA_ROOT = '/mnt/volume_mount/media/'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -80,7 +82,7 @@ STORAGES = {
 }
 
 # if you get a cors issue in deployment try adding a / at the end of the vercel url
-CORS_ALLOWED_ORIGINS = ['http://localhost:8080', 'https://galpal-frontend.vercel.app']
+CORS_ALLOWED_ORIGINS = ['http://localhost:8080', 'https://galpal.vercel.app']
 
 CORS_ALLOW_METHODS = [
     'GET',
