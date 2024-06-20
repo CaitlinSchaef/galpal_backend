@@ -241,15 +241,18 @@ def get_match_requests(request):
   match_request_serialized = RequestedMatchSerializer(match_request, many=True)
   return Response(match_request_serialized.data)
 
-#update match request
 
+#update match request
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
 def update_match_request(request, id):
-    try:
-        match_request = get_object_or_404(RequestedMatch, id=id)
+    user = request.user
+    profile = user.profile
 
-        if match_request.requester != request.user.profile and match_request.requested != request.user.profile:
+    try:
+        match_request = RequestedMatch.objects.get(id=id)
+
+        if match_request.requester != request.profile and match_request.requested != request.profile:
             return Response({'error': 'Not authorized to update this match request.'}, status=status.HTTP_403_FORBIDDEN)
 
         data = request.data
@@ -263,7 +266,8 @@ def update_match_request(request, id):
             # Create message channel
             channel_data = {
                 'name': f"{match_request.requester.display_name} and {match_request.requested.display_name}",
-                'users': [match_request.requester.id, match_request.requested.id]
+                'user1': [match_request.requester.id],
+                'user2': [match_request.requested.id],
             }
             channel_serializer = MessageChannelSerializer(data=channel_data)
             if channel_serializer.is_valid():
@@ -271,7 +275,7 @@ def update_match_request(request, id):
             else:
                 return Response(channel_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-            # Add to friends list
+            # Add to friends list, assigning both as user and friend to update both lists 
             friend_data_1 = {
                 'user': match_request.requester.id,
                 'friend': match_request.requested.id
@@ -301,8 +305,11 @@ def update_match_request(request, id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_message_channel(request):
-  message_channel = MessageChannel.objects.all()
-  message_channel_serialized = RequestedMatchSerializer(message_channel, many=True)
+  user = request.user
+  profile = user.profile
+  # I need to get all of the message channels where the profile = user1 or user 2, will this work?
+  message_channel = MessageChannel.objects.filter(user1=profile, user2=profile)
+  message_channel_serialized = MessageChannelSerializer(message_channel, many=True)
   return Response(message_channel_serialized.data)
 
 #create a message channel
@@ -331,15 +338,38 @@ def create_message_channel(request):
 def create_message(request):
    user = request.user
    profile = user.profile
-  
-   message_channel = MessageChannel.objects.create(
-       name = request.data['name'],
-       user1 = profile,
-       user2 = request.data['user2']
+
+    # idk how to do time here
+   message = Message.objects.create(
+       message_channel = request.data['message_channel'],
+       message_author = profile,
+       message_content = request.data['message_content'],
+       time= time,
    )
-   message_channel.save()
-   message_channel_serialized = MessageChannelSerializer(message_channel)
-   return Response(message_channel_serialized.data)
+   message.save()
+   message_serialized = MessageSerializer(message)
+   return Response(message_serialized.data)
+
+#get message
+# need to get messages for specific message channels, not authors
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_messages(request):
+  message_channel = request.data['message_channel']
+  message = Message.objects.all(message_channel=message_channel)
+  message_serialized = MessageSerializer(message, many=True)
+  return Response(message_serialized.data)
+
+##########################################################################################################
+# friends list
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_friend_list(request):
+  user = request.user
+  profile = user.profile
+  friend_list = FriendsList.objects.filter(user=profile)
+  friend_list_serialized = FriendsListSerializer(friend_list, many=True)
+  return Response(friend_list_serialized.data)
 
 
 ##########################################################################################################
