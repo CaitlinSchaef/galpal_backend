@@ -191,6 +191,14 @@ def get_interest_inventory(request):
   interest_inventory_serialized = InterestInventorySerializer(interest_inventory, many=True)
   return Response(interest_inventory_serialized.data)
 
+# get all interest inventories
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_all_interest_inventories(request):
+  interest_inventory = InterestInventory.objects.all()
+  interest_inventory_serialized = InterestInventorySerializer(interest_inventory, many=True)
+  return Response(interest_inventory_serialized.data)
+
 # update interest inventory, this works, had to make it a put instead of patch because of multiple instances 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -304,7 +312,7 @@ def create_match_request(request):
 def get_match_requests(request):
   user = request.user
   profile = user.profile
-  match_request = RequestedMatch.objects.get(requester=profile, requested=profile)
+  match_request = RequestedMatch.objects.get(requested=profile)
   match_request_serialized = RequestedMatchSerializer(match_request, many=True)
   return Response(match_request_serialized.data)
 

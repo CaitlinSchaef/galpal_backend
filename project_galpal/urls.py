@@ -24,6 +24,7 @@ urlpatterns = [
     path('create-answer/', create_answer),
     path('create-interest-inventory/', create_interest_inventory),
     path('get-interest-inventory/', get_interest_inventory),
+    path('get-all-interest-inventories/', get_all_interest_inventories),
     path('update-interest-inventory/', update_interest_inventory),
     path('get-interests/', get_interests),
     path('create-match-profile/', create_match_profile),
