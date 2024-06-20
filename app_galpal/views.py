@@ -16,7 +16,7 @@ from .serializers import *
 #########################################################################################################
 # User Views
 
-#delete user
+#delete user, not sure if this works
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_user(request):
@@ -25,8 +25,16 @@ def delete_user(request):
    user_to_delete.delete()
    return Response(status=status.HTTP_202_ACCEPTED)
 
+# not sure if I need this, doesn't have url
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get__all_profiles(request):
+  serializer = ProfileSerializer()
+  return Response(serializer.data)
 
-# Get Profile
+
+
+# Get Profile, is is just getting the current users profile, it works
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_profile(request):
@@ -38,7 +46,7 @@ def get_profile(request):
 
 
 #Create New User/User Profile
-# This works and saves images, as well as making sure the username, phone number, and email are unique.
+# This works and makes sure the username, phone number, and email are unique.
 @api_view(['POST'])
 @permission_classes([])
 # the parser helps it read data for images
@@ -65,7 +73,7 @@ def create_user(request):
 #########################################################################################################
 # Match Profile Questions
 
-# This gets all of the questions
+# This gets all of the questions, this works
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_profile_questions(request):
@@ -76,7 +84,7 @@ def get_profile_questions(request):
 #########################################################################################################
 # Match Profile Answers
 
-# This gets all of the answers for a specific user
+# This gets all of the answers for a specific user, this works
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_profile_answers(request):
@@ -87,8 +95,7 @@ def get_profile_answers(request):
   answers_serialized = MatchProfileAnswersSerializer(answers, many=True)
   return Response(answers_serialized.data)
 
-# This creates new answers
-# this works
+# This creates new answers, this works
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 # the parser helps it read data for images
@@ -120,7 +127,7 @@ def create_answer(request):
    answer_serialized = MatchProfileAnswersSerializer(answer)
    return Response(answer_serialized.data)
 
-# Update MatchProfileAnswers
+# Update MatchProfileAnswers, NOT SURE IF WORKS
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser])
@@ -139,7 +146,7 @@ def update_answer(request, pk):
 #########################################################################################################
 #interests
 
-#get all interests
+#get all interests, this works
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_interests(request):
@@ -150,7 +157,7 @@ def get_interests(request):
 #########################################################################################################
 #interest inventory 
 
-# create new interest inventory 
+# create new interest inventory, this works
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_interest_inventory(request):
@@ -173,7 +180,7 @@ def create_interest_inventory(request):
    interest_serialized = InterestInventorySerializer(interest_inventory)
    return Response(interest_serialized.data)
 
-# get interest inventory 
+# get interest inventory of current user, this works
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_interest_inventory(request):
@@ -184,8 +191,7 @@ def get_interest_inventory(request):
   interest_inventory_serialized = InterestInventorySerializer(interest_inventory, many=True)
   return Response(interest_inventory_serialized.data)
 
-# update interest inventory 
-
+# update interest inventory, this works, had to make it a put instead of patch because of multiple instances 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_interest_inventory(request):
@@ -214,7 +220,7 @@ def update_interest_inventory(request):
 ##########################################################################################################
 # Match Profile Display
 
-#create new Match Profile Display
+#create new Match Profile Display, this works
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 # the parser helps it read data for images
@@ -240,7 +246,7 @@ def create_match_profile(request):
    match_display_serialized = MatchProfileDisplaySerializer(match_display)
    return Response(match_display_serialized.data)
 
-# get match profile
+# get match profile, this works
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_match_profile(request):
@@ -252,13 +258,15 @@ def get_match_profile(request):
   match_profile_serialized = MatchProfileDisplaySerializer(match_profile)
   return Response(match_profile_serialized.data)
 
-# Update match profile
+# Update match profile, NOT SURE IF WORKS
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser])
-def update_match_profile(request, pk):
+def update_match_profile(request):
+    user = request.user
+    profile = user.profile
     try:
-        match_profile = MatchProfileDisplay.objects.get(pk=pk)
+        match_profile = MatchProfileDisplay.objects.get(user=profile)
     except MatchProfileDisplay.DoesNotExist:
         return Response({'error': 'MatchProfileDisplay not found.'}, status=status.HTTP_404_NOT_FOUND)
     
@@ -294,7 +302,9 @@ def create_match_request(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_match_requests(request):
-  match_request = RequestedMatch.objects.all()
+  user = request.user
+  profile = user.profile
+  match_request = RequestedMatch.objects.get(requester=profile, requested=profile)
   match_request_serialized = RequestedMatchSerializer(match_request, many=True)
   return Response(match_request_serialized.data)
 
