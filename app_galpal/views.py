@@ -95,6 +95,14 @@ def get_profile_answers(request):
   answers_serialized = MatchProfileAnswersSerializer(answers, many=True)
   return Response(answers_serialized.data)
 
+# get all user answers, this works 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_all_profile_answers(request):
+  answers = MatchProfileAnswers.objects.all()
+  answers_serialized = MatchProfileAnswersSerializer(answers, many=True)
+  return Response(answers_serialized.data)
+
 # This creates new answers, this works
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -191,7 +199,7 @@ def get_interest_inventory(request):
   interest_inventory_serialized = InterestInventorySerializer(interest_inventory, many=True)
   return Response(interest_inventory_serialized.data)
 
-# get all interest inventories
+# get all interest inventories, not sure if works
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_all_interest_inventories(request):
@@ -266,6 +274,14 @@ def get_match_profile(request):
   match_profile_serialized = MatchProfileDisplaySerializer(match_profile)
   return Response(match_profile_serialized.data)
 
+# get all match profiles, this works 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_all_match_profiles(request):
+  profiles = MatchProfileDisplay.objects.all()
+  profiles_serialized = MatchProfileDisplaySerializer(profiles, many=True)
+  return Response(profiles_serialized.data)
+
 # Update match profile, NOT SURE IF WORKS
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -290,17 +306,13 @@ def update_match_profile(request):
 #create a requested match
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-# the parser helps it read data for images
-@parser_classes([MultiPartParser, FormParser])
 def create_match_request(request):
    user = request.user
    profile = user.profile
   
    match_request = RequestedMatch.objects.create(
        requester = profile,
-       requested = request.data['requester'],
-       status = request.data['status'],
-       matched = request.data['matched']
+       requested = request.data['requested'],
    )
    match_request.save()
    match_request_serialized = RequestedMatchSerializer(match_request)
@@ -312,9 +324,13 @@ def create_match_request(request):
 def get_match_requests(request):
   user = request.user
   profile = user.profile
-  match_request = RequestedMatch.objects.get(requested=profile)
-  match_request_serialized = RequestedMatchSerializer(match_request, many=True)
-  return Response(match_request_serialized.data)
+  try:
+      match_request = RequestedMatch.objects.get(requested=profile)
+      match_request_serialized = RequestedMatchSerializer(match_request)
+      return Response(match_request_serialized.data)
+  except RequestedMatch.DoesNotExist:
+      print('HEY! this is fine, they just dont have any matches yet')
+      return Response(status=status.HTTP_200_OK)
 
 
 #update match request
