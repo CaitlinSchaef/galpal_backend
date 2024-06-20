@@ -33,6 +33,7 @@ urlpatterns = [
     path('get-message-channel/', get_message_channel),
     path('create-message/', create_message),
     path('get-messages/', get_messages),
+    path('get-friends-list/', get_friends_list),
     path('delete-user/', delete_user),
     path('refresh/', TokenRefreshView.as_view()),
     path('token/', TokenObtainPairView.as_view()),

@@ -344,7 +344,6 @@ def create_message(request):
        message_channel = request.data['message_channel'],
        message_author = profile,
        message_content = request.data['message_content'],
-       time= time,
    )
    message.save()
    message_serialized = MessageSerializer(message)
@@ -364,7 +363,7 @@ def get_messages(request):
 # friends list
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_friend_list(request):
+def get_friends_list(request):
   user = request.user
   profile = user.profile
   friend_list = FriendsList.objects.filter(user=profile)
