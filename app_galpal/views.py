@@ -120,6 +120,22 @@ def create_answer(request):
    answer_serialized = MatchProfileAnswersSerializer(answer)
    return Response(answer_serialized.data)
 
+# Update MatchProfileAnswers
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser])
+def update_answer(request, pk):
+    try:
+        match_profile_answer = MatchProfileAnswers.objects.get(pk=pk)
+    except MatchProfileAnswers.DoesNotExist:
+        return Response({'error': 'MatchProfileAnswers not found.'}, status=status.HTTP_404_NOT_FOUND)
+    
+    serializer = MatchProfileAnswersSerializer(match_profile_answer, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 #########################################################################################################
 #interests
 
@@ -168,6 +184,33 @@ def get_interest_inventory(request):
   interest_inventory_serialized = InterestInventorySerializer(interest_inventory, many=True)
   return Response(interest_inventory_serialized.data)
 
+# update interest inventory 
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_interest_inventory(request):
+    user = request.user
+    profile = user.profile
+
+    # Remove the existing interests for the user
+    InterestInventory.objects.filter(user=profile).delete()
+
+    # Create new interests for the user
+    interests_data = request.data.get('interests', [])
+    new_interests = []
+    for interest_name in interests_data:
+        interest = Interests.objects.get(interests=interest_name)
+        new_interests.append(InterestInventory(user=profile, interest=interest))
+    
+    InterestInventory.objects.bulk_create(new_interests)
+
+    # Fetch the updated interests
+    updated_interests = InterestInventory.objects.filter(user=profile)
+    serializer = InterestInventorySerializer(updated_interests, many=True)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 ##########################################################################################################
 # Match Profile Display
 
@@ -209,7 +252,21 @@ def get_match_profile(request):
   match_profile_serialized = MatchProfileDisplaySerializer(match_profile)
   return Response(match_profile_serialized.data)
 
-# update match profile
+# Update match profile
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser])
+def update_match_profile(request, pk):
+    try:
+        match_profile = MatchProfileDisplay.objects.get(pk=pk)
+    except MatchProfileDisplay.DoesNotExist:
+        return Response({'error': 'MatchProfileDisplay not found.'}, status=status.HTTP_404_NOT_FOUND)
+    
+    serializer = MatchProfileDisplaySerializer(match_profile, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #########################################################################################################
 #requested match stuff
@@ -243,6 +300,7 @@ def get_match_requests(request):
 
 
 #update match request
+# using a patch because we will really only update status or matched 
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
 def update_match_request(request, id):
@@ -308,6 +366,7 @@ def get_message_channel(request):
   user = request.user
   profile = user.profile
   # I need to get all of the message channels where the profile = user1 or user 2, will this work?
+  # if you get an error with getting message channels check here 
   message_channel = MessageChannel.objects.filter(user1=profile, user2=profile)
   message_channel_serialized = MessageChannelSerializer(message_channel, many=True)
   return Response(message_channel_serialized.data)

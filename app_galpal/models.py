@@ -43,7 +43,7 @@ class InterestInventory(models.Model):
   interest = models.ForeignKey(Interests, on_delete=models.SET_NULL, null=True, related_name='interest')
 
   def __str__(self):
-    return self.interest
+    return f"{self.user} - {self.interest}"
 
 # I'm nervous that message should come first with author content and time 
 
