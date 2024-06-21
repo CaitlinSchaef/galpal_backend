@@ -303,7 +303,7 @@ def update_match_profile(request):
 #########################################################################################################
 #requested match stuff
 
-#create a requested match, this works for passing 
+#create a requested match, this works for passing and friending 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_match_request(request):
@@ -327,7 +327,7 @@ def create_match_request(request):
    match_request_serialized = RequestedMatchSerializer(match_request)
    return Response(match_request_serialized.data)
 
-#get requested matches
+#get requested matches, this works 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_match_requests(request):
@@ -344,7 +344,7 @@ def get_match_requests(request):
 
 #update match request
 # using a patch because we will really only update status or matched 
-# Update match request
+# Update match request, this works 
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
 def update_match_request(request, id):
@@ -370,8 +370,8 @@ def update_match_request(request, id):
             # Create message channel
             channel_data = {
                 'name': f"{match_request.requester.user.username} and {match_request.requested.user.username}",
-                'user1': [match_request.requester.id],
-                'user2': [match_request.requested.id],
+                'user1': [match_request.requester.user.username],
+                'user2': [match_request.requested.user.username],
             }
             channel_serializer = MessageChannelSerializer(data=channel_data)
             if channel_serializer.is_valid():
@@ -381,12 +381,12 @@ def update_match_request(request, id):
 
             # Add to friends list, assigning both as user and friend to update both lists
             friend_data_1 = {
-                'user': match_request.requester.id,
-                'friend': [match_request.requested.id]
+                'user': match_request.requester.user.username,
+                'friend': [match_request.requested.user.username]
             }
             friend_data_2 = {
-                'user': match_request.requested.id,
-                'friend': [match_request.requester.id]
+                'user': match_request.requested.user.username,
+                'friend': [match_request.requester.user.username]
             }
             friend_serializer_1 = FriendsListSerializer(data=friend_data_1)
             friend_serializer_2 = FriendsListSerializer(data=friend_data_2)
@@ -405,7 +405,7 @@ def update_match_request(request, id):
 ##########################################################################################################
 # message channels
 
-#get message channel
+#get message channel, this works
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_message_channel(request):
@@ -413,11 +413,12 @@ def get_message_channel(request):
   profile = user.profile
   # I need to get all of the message channels where the profile = user1 or user 2, will this work?
   # if you get an error with getting message channels check here 
-  message_channel = MessageChannel.objects.filter(user1=profile, user2=profile)
+  message_channel = MessageChannel.objects.filter(user1=profile) | MessageChannel.objects.filter(user2=profile)
   message_channel_serialized = MessageChannelSerializer(message_channel, many=True)
   return Response(message_channel_serialized.data)
 
-#create a message channel
+
+#create a message channel, do not think I'll use this
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_message_channel(request):
@@ -454,7 +455,7 @@ def create_message(request):
    message_serialized = MessageSerializer(message)
    return Response(message_serialized.data)
 
-#get message
+#get messages
 # need to get messages for specific message channels, not authors
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

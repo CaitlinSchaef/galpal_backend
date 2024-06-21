@@ -54,9 +54,28 @@ class InterestInventorySerializer(serializers.ModelSerializer):
 
 #########################################################################################################
 class MessageChannelSerializer(serializers.ModelSerializer):
+  # doing the thing i did with the requested match serializer
+  # user1_display_name = serializers.SerializerMethodField()
+  # user2_display_name = serializers.SerializerMethodField()
+
+  # add these to fields if you change your mind: 'user1_display_name', 'user2_display_name'
   class Meta:
     model = MessageChannel
     fields = ['user1', 'user2', 'name']
+
+  # def get_user1_display_name(self, obj):
+  #    try:
+  #       match_profile_display = MatchProfileDisplay.objects.get(user=obj.requested)
+  #       return match_profile_display.display_name
+  #    except MatchProfileDisplay.DoesNotExist:
+  #       return None
+  
+  # def get_user2_display_name(self, obj):
+  #    try:
+  #       match_profile_display = MatchProfileDisplay.objects.get(user=obj.requested)
+  #       return match_profile_display.display_name
+  #    except MatchProfileDisplay.DoesNotExist:
+  #       return None
 
 #########################################################################################################
 class MessageSerializer(serializers.ModelSerializer):
