@@ -370,8 +370,8 @@ def update_match_request(request, id):
             # Create message channel
             channel_data = {
                 'name': f"{match_request.requester.user.username} and {match_request.requested.user.username}",
-                'user1': [match_request.requester.user.username],
-                'user2': [match_request.requested.user.username],
+                'user1': [match_request.requester.id],
+                'user2': [match_request.requested.id],
             }
             channel_serializer = MessageChannelSerializer(data=channel_data)
             if channel_serializer.is_valid():
@@ -381,12 +381,12 @@ def update_match_request(request, id):
 
             # Add to friends list, assigning both as user and friend to update both lists
             friend_data_1 = {
-                'user': match_request.requester.user.username,
-                'friend': [match_request.requested.user.username]
+                'user': match_request.requester.id,
+                'friend': [match_request.requested.id]
             }
             friend_data_2 = {
-                'user': match_request.requested.user.username,
-                'friend': [match_request.requester.user.username]
+                'user': match_request.requested.id,
+                'friend': [match_request.requester.id]
             }
             friend_serializer_1 = FriendsListSerializer(data=friend_data_1)
             friend_serializer_2 = FriendsListSerializer(data=friend_data_2)
