@@ -344,6 +344,7 @@ def get_match_requests(request):
 
 #update match request
 # using a patch because we will really only update status or matched 
+# Update match request
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
 def update_match_request(request, id):
@@ -351,9 +352,11 @@ def update_match_request(request, id):
     profile = user.profile
 
     try:
+        # serialized the requested match id so that we could use that in the front end
         match_request = RequestedMatch.objects.get(id=id)
 
-        if match_request.requester != request.profile and match_request.requested != request.profile:
+        # checks if the current user is either the requester or the requested user
+        if match_request.requester != profile and match_request.requested != profile:
             return Response({'error': 'Not authorized to update this match request.'}, status=status.HTTP_403_FORBIDDEN)
 
         data = request.data
@@ -366,7 +369,7 @@ def update_match_request(request, id):
 
             # Create message channel
             channel_data = {
-                'name': f"{match_request.requester.display_name} and {match_request.requested.display_name}",
+                'name': f"{match_request.requester.user.username} and {match_request.requested.user.username}",
                 'user1': [match_request.requester.id],
                 'user2': [match_request.requested.id],
             }
@@ -376,14 +379,14 @@ def update_match_request(request, id):
             else:
                 return Response(channel_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-            # Add to friends list, assigning both as user and friend to update both lists 
+            # Add to friends list, assigning both as user and friend to update both lists
             friend_data_1 = {
                 'user': match_request.requester.id,
-                'friend': match_request.requested.id
+                'friend': [match_request.requested.id]
             }
             friend_data_2 = {
                 'user': match_request.requested.id,
-                'friend': match_request.requester.id
+                'friend': [match_request.requester.id]
             }
             friend_serializer_1 = FriendsListSerializer(data=friend_data_1)
             friend_serializer_2 = FriendsListSerializer(data=friend_data_2)
@@ -398,7 +401,7 @@ def update_match_request(request, id):
 
     except RequestedMatch.DoesNotExist:
         return Response({'error': 'Match request not found.'}, status=status.HTTP_404_NOT_FOUND)
-
+    
 ##########################################################################################################
 # message channels
 

@@ -17,8 +17,16 @@ class InterestInventoryAdmin(admin.ModelAdmin):
 class RequestedMatchAdmin(admin.ModelAdmin):
   pass
 
+class MessageChannelAdmin(admin.ModelAdmin):
+  pass
+
+class FriendsListAdmin(admin.ModelAdmin):
+  pass
+
 admin.site.register(Profile, ProfileAdmin)
 admin.site.register(MatchProfileAnswers, MatchProfileAnswersAdmin)
 admin.site.register(MatchProfileDisplay, MatchProfileDisplayAdmin)
 admin.site.register(InterestInventory, InterestInventoryAdmin)
 admin.site.register(RequestedMatch, RequestedMatchAdmin)
+admin.site.register(MessageChannel, MessageChannelAdmin)
+admin.site.register(FriendsList, FriendsListAdmin)

@@ -22,7 +22,7 @@ class RequestedMatchSerializer(serializers.ModelSerializer):
 
   class Meta:
       model = RequestedMatch
-      fields = ['requester', 'requester_display_name', 'requested', 'requested_display_name', 'status', 'matched']
+      fields = ['requester', 'requester_display_name', 'requested', 'requested_display_name', 'status', 'matched', 'id']
 
   def get_requester_display_name(self, obj):
       try:

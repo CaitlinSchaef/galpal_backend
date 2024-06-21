@@ -34,7 +34,7 @@ urlpatterns = [
     path('update-match-profile/', update_match_profile), 
     path('create-match-request/', create_match_request),
     path('get-match-requests/', get_match_requests),
-    path('update-match-request/', update_match_request),
+    path('update-match-request/<int:id>/', update_match_request),
     path('create-message-channel/', create_message_channel),
     path('get-message-channel/', get_message_channel),
     path('create-message/', create_message),
