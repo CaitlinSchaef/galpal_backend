@@ -28,7 +28,7 @@ class RequestedMatch(models.Model):
   matched = models.BooleanField(default=False)
 
   def __str__(self):
-    return f'Current User: {self.requester} Wants to Match With: {self.requested}'
+    return f'Requester: {self.requester} Requested: {self.requested} Status: {self.status}'
 
 #I think you could make a model called Friend List and create it when a match = true 
 

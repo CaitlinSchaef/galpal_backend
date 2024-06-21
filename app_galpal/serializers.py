@@ -16,9 +16,27 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 #########################################################################################################
 class RequestedMatchSerializer(serializers.ModelSerializer):
+  # was having trouble getting the right info in the front end, so i adjusted this so that I could grab the display_name from the MatchProfileDisplay model
+  requester_display_name = serializers.SerializerMethodField()
+  requested_display_name = serializers.SerializerMethodField()
+
   class Meta:
-    model = RequestedMatch
-    fields = ['requester', 'requested', 'status', 'matched', 'status_choices']
+      model = RequestedMatch
+      fields = ['requester', 'requester_display_name', 'requested', 'requested_display_name', 'status', 'matched']
+
+  def get_requester_display_name(self, obj):
+      try:
+          match_profile_display = MatchProfileDisplay.objects.get(user=obj.requester)
+          return match_profile_display.display_name
+      except MatchProfileDisplay.DoesNotExist:
+          return None
+
+  def get_requested_display_name(self, obj):
+      try:
+          match_profile_display = MatchProfileDisplay.objects.get(user=obj.requested)
+          return match_profile_display.display_name
+      except MatchProfileDisplay.DoesNotExist:
+          return None
 
 #########################################################################################################
 class InterestsSerializer(serializers.ModelSerializer):

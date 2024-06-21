@@ -334,8 +334,8 @@ def get_match_requests(request):
   user = request.user
   profile = user.profile
   try:
-      match_request = RequestedMatch.objects.get(requested=profile)
-      match_request_serialized = RequestedMatchSerializer(match_request)
+      match_requests = RequestedMatch.objects.filter(requester=profile) | RequestedMatch.objects.filter(requested=profile)
+      match_request_serialized = RequestedMatchSerializer(match_requests, many=True)
       return Response(match_request_serialized.data)
   except RequestedMatch.DoesNotExist:
       print('HEY! this is fine, they just dont have any matches yet')
