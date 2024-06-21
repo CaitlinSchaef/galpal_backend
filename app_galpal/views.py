@@ -303,16 +303,25 @@ def update_match_profile(request):
 #########################################################################################################
 #requested match stuff
 
-#create a requested match
+#create a requested match, this works for passing 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_match_request(request):
    user = request.user
    profile = user.profile
+
+  # this produces a string of the user id 
+   requested_display_name = request.data['requested']
+    # this prints a Display name 
+   print('DATA FROM REQUESTED: ', requested_display_name)
+  #  first get the match profile, then get the profile instance from that 
+   match_profile_display = MatchProfileDisplay.objects.get(display_name=requested_display_name)
+   profile_instance = match_profile_display.user
   
    match_request = RequestedMatch.objects.create(
        requester = profile,
-       requested = request.data['requested'],
+       requested = profile_instance,
+       status = request.data['status']
    )
    match_request.save()
    match_request_serialized = RequestedMatchSerializer(match_request)

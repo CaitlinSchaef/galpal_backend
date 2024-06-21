@@ -9,7 +9,7 @@ class Profile(models.Model):
   email = models.EmailField(max_length=254, unique=True, null=True)
 
   def __str__(self):
-    return self.user.username
+    return f'{self.user.username} ID: {self.user.id}'
 
 
 class RequestedMatch(models.Model):
