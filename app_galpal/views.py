@@ -444,13 +444,16 @@ def create_message_channel(request):
 def create_message(request):
    user = request.user
    profile = user.profile
+   try:
+      message_channel = MessageChannel.objects.get(name=request.data['message_channel'])
+   except MessageChannel.DoesNotExist:
+        return Response({'error': 'MessageChannel not found'}, status=status.HTTP_404_NOT_FOUND)
 
-    # idk how to do time here
    message = Message.objects.create(
-       message_channel = request.data['message_channel'],
-       message_author = profile,
-       message_content = request.data['message_content'],
-   )
+        message_channel=message_channel,
+        message_author=profile,
+        message_content=request.data['message_content'],
+    )
    message.save()
    message_serialized = MessageSerializer(message)
    return Response(message_serialized.data)
@@ -460,9 +463,17 @@ def create_message(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_messages(request):
-  message_channel = request.data['message_channel']
-  message = Message.objects.all(message_channel=message_channel)
-  message_serialized = MessageSerializer(message, many=True)
+  message_channel_name = request.query_params.get('message_channel')
+  if not message_channel_name:
+      return Response({'error': 'message_channel is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+  try:
+      message_channel = MessageChannel.objects.get(name=message_channel_name)
+  except MessageChannel.DoesNotExist:
+      return Response({'error': 'MessageChannel not found'}, status=status.HTTP_404_NOT_FOUND)
+
+  messages = Message.objects.filter(message_channel=message_channel)
+  message_serialized = MessageSerializer(messages, many=True)
   return Response(message_serialized.data)
 
 ##########################################################################################################
