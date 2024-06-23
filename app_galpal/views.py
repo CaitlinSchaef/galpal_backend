@@ -282,19 +282,25 @@ def get_all_match_profiles(request):
   profiles_serialized = MatchProfileDisplaySerializer(profiles, many=True)
   return Response(profiles_serialized.data)
 
-# Update match profile, NOT SURE IF WORKS
+# Update match profile, works now yaya
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser])
 def update_match_profile(request):
     user = request.user
     profile = user.profile
+    print('REQUEST DATA:', request.data)
     try:
         match_profile = MatchProfileDisplay.objects.get(user=profile)
     except MatchProfileDisplay.DoesNotExist:
         return Response({'error': 'MatchProfileDisplay not found.'}, status=status.HTTP_404_NOT_FOUND)
-    
-    serializer = MatchProfileDisplaySerializer(match_profile, data=request.data)
+
+    # Remove 'profile_photo' from the request data if it's not a file
+    data = request.data.copy()
+    if 'profile_photo' in data and isinstance(data['profile_photo'], str):
+        del data['profile_photo']
+
+    serializer = MatchProfileDisplaySerializer(match_profile, data=data, partial=True)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -438,7 +444,7 @@ def create_message_channel(request):
 ##########################################################################################################
 # messages
 
-#create a new message
+#create a new message, this works
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_message(request):
@@ -459,7 +465,7 @@ def create_message(request):
    return Response(message_serialized.data)
 
 #get messages
-# need to get messages for specific message channels, not authors
+# need to get messages for specific message channels, not authors, this works 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_messages(request):
