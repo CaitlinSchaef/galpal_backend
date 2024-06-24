@@ -319,25 +319,29 @@ def update_match_profile(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_match_request(request):
-   user = request.user
-   profile = user.profile
+  try:
+    user = request.user
+    profile = user.profile
 
-  # this produces a string of the user id 
-   requested_display_name = request.data['requested']
-    # this prints a Display name 
-   print('DATA FROM REQUESTED: ', requested_display_name)
-  #  first get the match profile, then get the profile instance from that 
-   match_profile_display = MatchProfileDisplay.objects.get(display_name=requested_display_name)
-   profile_instance = match_profile_display.user
-  
-   match_request = RequestedMatch.objects.create(
-       requester = profile,
-       requested = profile_instance,
-       status = request.data['status']
-   )
-   match_request.save()
-   match_request_serialized = RequestedMatchSerializer(match_request)
-   return Response(match_request_serialized.data)
+    # this produces a string of the user id 
+    requested_display_name = request.data['requested']
+      # this prints a Display name 
+    print('DATA FROM REQUESTED: ', requested_display_name)
+    #  first get the match profile, then get the profile instance from that 
+    match_profile_display = MatchProfileDisplay.objects.get(display_name=requested_display_name)
+    profile_instance = match_profile_display.user
+    
+    match_request = RequestedMatch.objects.create(
+        requester = profile,
+        requested = profile_instance,
+        status = request.data['status']
+    )
+    match_request.save()
+    match_request_serialized = RequestedMatchSerializer(match_request)
+    return Response(match_request_serialized.data)
+  except Exception as e:
+     print('BLAMMO: THERE HAS BEEN A TERRIBLE THING HAPPEN: ', e)
+     return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 #get requested matches, this works 
 @api_view(['GET'])
