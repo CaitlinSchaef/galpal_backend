@@ -328,7 +328,8 @@ def create_match_request(request):
       # this prints a Display name 
     print('DATA FROM REQUESTED: ', requested_display_name)
     #  first get the match profile, then get the profile instance from that 
-    match_profile_display = MatchProfileDisplay.objects.get(display_name=requested_display_name)
+    # the next line is a bad fix, you need to get the ID from the front end like you do in requested match 
+    match_profile_display = MatchProfileDisplay.objects.filter(display_name=requested_display_name).first()
     profile_instance = match_profile_display.user
     
     match_request = RequestedMatch.objects.create(
