@@ -362,7 +362,7 @@ def get_match_requests(request):
 #update match request
 # using a patch because we will really only update status or matched 
 # Update match request, this works 
-@api_view(['PATCH'])
+@api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_match_request(request, id):
     user = request.user
