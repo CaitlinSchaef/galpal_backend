@@ -145,10 +145,16 @@ def update_answer(request, pk):
     except MatchProfileAnswers.DoesNotExist:
         return Response({'error': 'MatchProfileAnswers not found.'}, status=status.HTTP_404_NOT_FOUND)
     
-    serializer = MatchProfileAnswersSerializer(match_profile_answer, data=request.data)
+    # Remove 'profile_photo' from the request data if it's not a file
+    data = request.data.copy()
+    if 'image_answer' in data and isinstance(data['image_answer'], str):
+        del data['image_answer']
+    
+    serializer = MatchProfileAnswersSerializer(match_profile_answer, data=data, partial=True)  # Ensure partial=True for partial updates
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #########################################################################################################

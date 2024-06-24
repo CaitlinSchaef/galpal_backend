@@ -105,7 +105,7 @@ class MatchProfileAnswersSerializer(serializers.ModelSerializer):
 
   class Meta:
     model = MatchProfileAnswers
-    fields = ['user', 'question', 'answer', 'image_answer', 'profile_display']
+    fields = ['user', 'question', 'answer', 'image_answer', 'profile_display', 'id']
 
 #########################################################################################################
 class FriendsListSerializer(serializers.ModelSerializer):

@@ -21,7 +21,7 @@ urlpatterns = [
     path('get-questions/', get_profile_questions),
     path('get-answers/', get_profile_answers),
     path('get-all-answers/', get_all_profile_answers),
-    path('update-answer/', update_answer),
+    path('update-answer/<int:pk>/', update_answer),
     path('create-answer/', create_answer),
     path('create-interest-inventory/', create_interest_inventory),
     path('get-interest-inventory/', get_interest_inventory),
