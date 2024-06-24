@@ -397,21 +397,21 @@ def update_match_request(request, id):
                 return Response(channel_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
             # Add to friends list, assigning both as user and friend to update both lists
-            friend_data_1 = {
-                'user': match_request.requester.id,
-                'friend': [match_request.requested.id]
-            }
-            friend_data_2 = {
-                'user': match_request.requested.id,
-                'friend': [match_request.requester.id]
-            }
-            friend_serializer_1 = FriendsListSerializer(data=friend_data_1)
-            friend_serializer_2 = FriendsListSerializer(data=friend_data_2)
-            if friend_serializer_1.is_valid() and friend_serializer_2.is_valid():
-                friend_serializer_1.save()
-                friend_serializer_2.save()
-            else:
-                return Response(friend_serializer_1.errors or friend_serializer_2.errors, status=status.HTTP_400_BAD_REQUEST)
+            # friend_data_1 = {
+            #     'user': match_request.requester.id,
+            #     'friend': [match_request.requested.id]
+            # }
+            # friend_data_2 = {
+            #     'user': match_request.requested.id,
+            #     'friend': [match_request.requester.id]
+            # }
+            # friend_serializer_1 = FriendsListSerializer(data=friend_data_1)
+            # friend_serializer_2 = FriendsListSerializer(data=friend_data_2)
+            # if friend_serializer_1.is_valid() and friend_serializer_2.is_valid():
+            #     friend_serializer_1.save()
+            #     friend_serializer_2.save()
+            # else:
+            #     return Response(friend_serializer_1.errors or friend_serializer_2.errors, status=status.HTTP_400_BAD_REQUEST)
 
         match_request.save()
         return Response(RequestedMatchSerializer(match_request).data, status=status.HTTP_200_OK)
